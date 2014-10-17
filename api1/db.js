@@ -15,3 +15,4 @@ exports.getConnection = function(callback) {
 };
 
 exports.escape = mysql.escape;
+exports.escapeId = mysql.escapeId;

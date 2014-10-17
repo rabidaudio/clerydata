@@ -60,20 +60,24 @@ var Incidents = require('./incidents');
         //         }
         //     }
         // }
-var log = console.log.bind(console);
+var count = 0;
+var log = function(stuff){
+    console.log(++count, stuff);
+};
 
-Schools.on('ready', function(){console.log("ready!")});
-// console.log(Schools);
+Schools.on('ready', function(){
+    Schools.search({population: {total: {more_than: 9000}}}, log);
+    Schools.search({population: {total: {more_than: 9000, less_than: 10000}, women:{more_than: 1}, men:{less_than: 10}}},log);
+    Schools.search({location:{city: "nowhere", state:"TN", zip: 12345}},log);
+    Schools.search({name: "Dummy School for Dummies"}, log);
+    Schools.search({name: "Dummy"}, log);
+    Schools.search({name: "DSD"}, log);
+    Schools.search({name: "nonsense"}, log);
+    Schools.search({type: "public, 4-year"});
+    Schools.search({location: {barf: "bag"}}, log);
 
+    Schools.get(1, log);
+    Schools.get(99, log);
 
-
-
-// setTimeout(function(){
-//     Schools.search({population: {total: {more_than: 9000}}}, log);
-//     Schools.search({population: {total: {more_than: 9000, less_than: 10000}, women:{more_than: 1}, men:{less_than: 10}}, location:{city: "nowhere", state:"TN", zip: 12345}},log);
-//     Schools.search({name: "Dummy School for Dummies"}, log);
-//     Schools.search({name: "Dummy"}, log);
-//     Schools.search({name: "DSD"}, log);
-//     Schools.search({name: "nonsense"}, log);
-//     Schools.search({type: "public, 4-year"});
-// }, 1000);
+    Schools.search(null, log);
+});
