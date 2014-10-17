@@ -20,10 +20,14 @@ var db = require('./db');
 var fuse = null;
 
 //Go ahead and build the search function for the fuzzy name search
-db.getConnection(function(connection){
+db.getConnection(function(err, connection){
 
     //get all names and nicknames
-    connection.query("SELECT id, name, (SELECT GROUP_CONCAT(name) FROM  `nicknames` WHERE  `nicknames`.school_id =  `schools`.id) AS  'nicknames' FROM schools", function(error, results) {
+    connection.query(
+        "SELECT id, name,"+
+        " (SELECT GROUP_CONCAT(name) FROM  `nicknames` WHERE  `nicknames`.school_id =  `schools`.id)"+
+        " AS  'nicknames' FROM schools",
+    function(error, results) {
         if(error){
             Schools.emit("connection_error", error);
             return;
@@ -146,10 +150,10 @@ var Schools = new events.EventEmitter();
 Schools.search = function(params, callback){
     if(!params) params = {};
 
-    var sql = "SELECT *, (male_pop + female_pop) as total_pop, (female_pop/(male_pop + female_pop)) as ratio,";
-    sql += " (SELECT GROUP_CONCAT(name) FROM  `campuses`  WHERE  `campuses`.school_id  =  `schools`.id) AS  'campuses',";
-    sql += " (SELECT GROUP_CONCAT(name) FROM  `nicknames` WHERE  `nicknames`.school_id =  `schools`.id) AS  'nicknames'";
-    sql += " FROM schools WHERE 1"; //allows us to AND every time
+    var sql =   "SELECT *, (male_pop + female_pop) as total_pop, (female_pop/(male_pop + female_pop)) as ratio,"+
+                " (SELECT GROUP_CONCAT(name) FROM  `campuses`  WHERE  `campuses`.school_id  =  `schools`.id) AS  'campuses',"+
+                " (SELECT GROUP_CONCAT(name) FROM  `nicknames` WHERE  `nicknames`.school_id =  `schools`.id) AS  'nicknames'"+
+                " FROM schools WHERE 1"; //allows us to AND every time
 
     if(params.location){
         _.each(params.location, function(value, key, list){
@@ -200,7 +204,8 @@ Schools.search = function(params, callback){
     sql += " LIMIT 50"; //TODO paging system
     
     //run query
-    db.getConnection(function(connection){
+    db.getConnection(function(err, connection){
+        //handle error
         console.log(sql);
         connection.query(sql, function(error, results){
             if(error){
@@ -215,7 +220,7 @@ Schools.search = function(params, callback){
 };
 
 Schools.get = function(id, callback){
-    db.getConnection(function(connection){
+    db.getConnection(function(err, connection){
         connection.query("SELECT * FROM schools WHERE id = ?", [id], function(error, result){
             //hanlde error
             connection.release();
