@@ -1,2 +1,3 @@
 database_info.json
 *.sql
+node_modules
