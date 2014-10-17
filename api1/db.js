@@ -13,3 +13,5 @@ exports.getConnection = function(callback) {
         callback(connection);
     });
 };
+
+exports.escape = mysql.escape;
